@@ -17,7 +17,7 @@ downloads:
     image: "{{ centos_image }}"
     tag: "{{ centos_tag }}"
   postgresql:
-    enabled: "{{ allspark_postgres.enabled }}"
+    enabled: "{{ allspark_artifactory.enabled }}"
     image: "{{ postgresql_image }}"
     tag: "{{ postgresql_tag }}"
   artifactory:

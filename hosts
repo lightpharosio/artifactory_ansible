@@ -1,2 +1,2 @@
 [artifactory]
-artifactory.allspark.xxx.corp     ansible_connection=ssh        ansible_user=myaccount
+192.168.1.50     ansible_connection=ssh        ansible_user=ansible

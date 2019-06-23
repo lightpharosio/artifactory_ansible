@@ -13,7 +13,7 @@
 
 - name: Setup Artifactory service
   docker_container:
-    name: artifactory-{{ downloads.artifactory.tag }}
+    name: artifactory
     image: "{{ downloads.artifactory.image }}:{{ downloads.artifactory.tag }}"
     state: "{{ allspark_artifactory.enabled and 'started' or 'absent'}}"
     env:
@@ -28,7 +28,6 @@
     networks:
       - name: bridge
       - name: allspark_artifactory_database
-    dns_servers: "{{allspark_dns_server}}"
     volumes:
       - "allspark_artifactory_data:/var/opt/jfrog/artifactory"
       - "{{ allspark_root_directory }}/config/artifactory/artifactory.lic:/artifactory_extra_conf/artifactory.lic"

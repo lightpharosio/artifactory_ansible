@@ -1,4 +1,11 @@
 ---
-allspark_dns_server: 8.8.8.8
+allspark_docker_version: "18.06"
 allspark_root_directory: "/opt/allspark/"
 artifactorydb_password: "MyLovelyArtifactory31"
+
+allspark_nginx:
+ enabled: true
+ ssl: false
+
+allspark_artifactory:
+ enabled: true
