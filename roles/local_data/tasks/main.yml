@@ -1,0 +1,20 @@
+- name: allspark_root_directory creation
+  file:
+    state: directory
+    path: "{{ allspark_root_directory }}"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: 0740
+  become: yes
+
+- name: allspark data/config directory creation
+  file:
+    state: directory
+    path: "{{ allspark_root_directory }}/{{item}}"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: 0740
+  with_items:
+    - config
+    - data
+  become: yes
