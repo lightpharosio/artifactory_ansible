@@ -1,0 +1,25 @@
+- name: Docker volumes creation
+  docker_volume:
+    name: "allspark_{{ item }}"
+  with_items:
+    - artifactory_postgres_data
+  when: allspark_artifactory.enabled
+
+- name: Setup PostgreSQL database
+  docker_container:
+    name: artifactory_database
+    image: "{{ downloads.postgresql.image }}:{{ downloads.postgresql.tag }}"
+    state: "{{ allspark_postgres.enabled and 'started' or 'absent'}}"
+    env:
+      POSTGRES_USER: "artifactory"
+      POSTGRES_PASSWORD: "{{ artifactorydb_password }}"
+      POSTGRES_DB: "artifactory"
+      POSTGRES_INITDB_ARGS: "--data-checksums"
+    purge_networks: true
+    user: artifactory
+    networks:
+      - name: allspark_artifactory_database
+    dns_servers: "{{allspark_dns_server}}"
+    volumes:
+      - "allspark_artifactory_postgres_data:/var/lib/postgresql/data"
+    restart_policy: always

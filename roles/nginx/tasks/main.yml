@@ -1,0 +1,29 @@
+- name: Artifactory config directory
+  file:
+    state: directory
+    path: "{{ allspark_root_directory }}/config/nginx/"
+  when: allspark_artifactory.enabled
+
+- name: Docker volumes creation
+  docker_volume:
+    name: "allspark_{{ item }}"
+  with_items:
+    - artifactory_nginx_data
+  when: allspark_ngnix.enabled
+
+- name: Setup NGINX
+  docker_container:
+    name: nginx
+    image: "{{ downloads.nginx.image }}:{{ downloads.nginx.tag }}"
+    state: "{{ allspark_nginx.enabled and 'started' or 'absent'}}"
+    env:
+      ART_BASE_URL: http://artifactory:8081/artifactory
+      SSL: "{{ allspark_nginx.enabled }}"
+    purge_networks: true
+    networks:
+      - name: bridge
+    dns_servers: "{{allspark_dns_server}}"
+    volumes:
+      - "{{ allspark_root_directory }}/config/nginx/:/var/opt/jfrog/nginx/ssl"
+      - "allspark_artifactory_nginx_data:/var/opt/jfrog/nginx"
+    restart_policy: always

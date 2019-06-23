@@ -1,0 +1,36 @@
+# Images
+centos_image: centos
+postgresql_image: docker.bintray.io/postgres
+artifactory_image: docker.bintray.io/jfrog/artifactory-pro
+nginx_image: docker.bintray.io/jfrog/nginx-artifactory-pro
+# Tags
+# Alpine tag is required, because it bundle rsyslogd
+# which allow us to read logs from HAProxy
+centos_tag: 7
+postgresql_tag: 9.6.11
+artifactory_tag: 6.10.4
+nginx_tag: 6.10.4
+# Downloads
+downloads:
+  centos:
+    enabled: true
+    image: "{{ centos_image }}"
+    tag: "{{ centos_tag }}"
+  postgresql:
+    enabled: "{{ allspark_postgres.enabled }}"
+    image: "{{ postgresql_image }}"
+    tag: "{{ postgresql_tag }}"
+  artifactory:
+    enabled: "{{ allspark_artifactory.enabled }}"
+    image: "{{ artifactory_image }}"
+    tag: "{{ artifactory_tag }}"
+  nginx:
+    enabled: "{{ allspark_nginx.enabled }}"
+    image: "{{ nginx_image }}"
+    tag: "{{ nginx_tag }}"
+
+# Misc
+
+## Set this to true to force the download of every images, even if they are
+## disabled in the configuration
+force_download: false

@@ -1,0 +1,35 @@
+- name: Artifactory config directory
+  file:
+    state: directory
+    path: "{{ allspark_root_directory }}/config/artifactory/"
+  when: allspark_artifactory.enabled
+
+- name: Docker volumes creation
+  docker_volume:
+    name: "allspark_{{ item }}"
+  with_items:
+    - artifactory_data
+  when: allspark_artifactory.enabled
+
+- name: Setup Artifactory service
+  docker_container:
+    name: artifactory-{{ downloads.artifactory.tag }}
+    image: "{{ downloads.artifactory.image }}:{{ downloads.artifactory.tag }}"
+    state: "{{ allspark_artifactory.enabled and 'started' or 'absent'}}"
+    env:
+      DB_TYPE: postgresql
+      # The following must match the POSTGRES_USER and POSTGRES_PASSWORD values passed to PostgreSQL
+      DB_USER: artifactory
+      DB_PASSWORD: "{{ artifactorydb_password }}"
+      # Add extra Java options by uncommenting the following line
+      #- EXTRA_JAVA_OPTIONS=-Xmx4g
+    purge_networks: true
+    user: artifactory
+    networks:
+      - name: bridge
+      - name: allspark_artifactory_database
+    dns_servers: "{{allspark_dns_server}}"
+    volumes:
+      - "allspark_artifactory_data:/var/opt/jfrog/artifactory"
+      - "{{ allspark_root_directory }}/config/artifactory/artifactory.lic:/artifactory_extra_conf/artifactory.lic"
+    restart_policy: always
