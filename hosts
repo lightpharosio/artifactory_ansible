@@ -1,4 +1,2 @@
 [artifactory]
 artifactory.allspark.xxx.corp     ansible_connection=ssh        ansible_user=myaccount
-[xray]
-xray.allspark.xxx.corp     ansible_connection=ssh        ansible_user=myaccount
