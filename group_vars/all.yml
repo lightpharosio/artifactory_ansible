@@ -9,3 +9,16 @@ allspark_nginx:
 
 allspark_artifactory:
  enabled: true
+
+allspark_artifactory_postgres:
+ enabled: false
+
+allspark_xray:
+ enabled: true
+ xray_data: ""
+ ports: ""
+ mount_root: ""
+ postgres_user: ""
+ postgres_password: ""
+ rabbitmq_erlang_cookie: ""
+ 

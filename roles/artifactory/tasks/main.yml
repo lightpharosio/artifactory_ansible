@@ -11,6 +11,24 @@
     - artifactory_data
   when: allspark_artifactory.enabled
 
+- name: Setup PostgreSQL database
+  docker_container:
+    name: artifactory_database
+    image: "{{ downloads.postgresql.image }}:{{ downloads.postgresql.tag }}"
+    state: "{{ allspark_artifactory.enabled and 'started' or 'absent'}}"
+    env:
+      POSTGRES_USER: "artifactory"
+      POSTGRES_PASSWORD: "{{ artifactorydb_password }}"
+      POSTGRES_DB: "artifactory"
+      POSTGRES_INITDB_ARGS: "--data-checksums"
+    user: postgres
+    networks:
+      - name: allspark_artifactory_database
+    volumes:
+      - "allspark_artifactory_postgres_data:/var/lib/postgresql/data"
+    restart_policy: always
+  when: allspark_artifactory_postgres.enabled
+
 - name: Setup Artifactory service
   docker_container:
     name: artifactory
@@ -18,6 +36,7 @@
     state: "{{ allspark_artifactory.enabled and 'started' or 'absent'}}"
     env:
       DB_TYPE: postgresql
+      DB_HOST: artifactory_database
       # The following must match the POSTGRES_USER and POSTGRES_PASSWORD values passed to PostgreSQL
       DB_USER: artifactory
       DB_PASSWORD: "{{ artifactorydb_password }}"

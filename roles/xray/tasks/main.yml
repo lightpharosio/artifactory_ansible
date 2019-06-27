@@ -1,0 +1,112 @@
+- name: Docker network creation
+  docker_network:
+    name: "artifactory_db"
+  when: allspark_xray.enabled
+
+- name: Docker network creation
+  docker_network:
+    name: "xray_default"
+  when: allspark_xray.enabled
+
+
+- name: Setup XRAY Rabbitmq
+  docker_container:
+    name: xray_rabbitmq_1
+    image: "{{ downloads.rabbitmq.image }}:{{ downloads.rabbitmq.tag }}"
+    state: "{{ allspark_xray.enabled and 'started' or 'absent'}}"
+    env:
+      RABBITMQ_ERLANG_COOKIE: "{{ allspark_xray.rabbitmq_erlang_cookie }}"
+    networks:
+      - name: artifactory_db
+    volumes:
+      - "{{ allspark_xray.mount_root }}/rabbitmq:/var/lib/rabbitmq"
+    restart_policy: always
+  when: allspark_xray.enabled
+
+- name: Setup XRAY PostGreSQL
+  docker_container:
+    name: xray_postgres_1
+    image: "{{ downloads.postgresql.image }}:{{ downloads.postgresql.tag }}"
+    state: "{{ allspark_xray.enabled and 'started' or 'absent'}}"
+    env:
+      POSTGRES_USER: "{{ allspark_xray.postgres_user }}"
+      POSTGRES_PASSWORD: "{{ allspark_xray.postgres_password }}"
+      POSTGRES_DB: "{{ allspark_xray.postgres_db }}"
+    networks:
+      - name: artifactory_db
+    volumes:
+      - "{{ allspark_xray.mount_root }}/postgres:/var/lib/postgresql/data"
+    restart_policy: always
+  when: allspark_xray.enabled
+
+- name: Setup XRAY MongoDB
+  docker_container:
+    name: xray_mongodb_1
+    image: "{{ downloads.mongodb.image }}:{{ downloads.mongodb.tag }}"
+    state: "{{ allspark_xray.enabled and 'started' or 'absent'}}"
+    entrypoint: /bin/bash -c "chmod 777 /data/logs; /entrypoint.sh --logpath /data/logs/xray-mongo.log --auth"
+    network:
+      - name: artifactory_db
+    volumes:
+      - "{{ allspark_xray.mount_root }}/mongodb/logs:/data/logs"
+      - "{{ allspark_xray.mount_root }}/mongodb/configdb":/data/configdb"
+      - "{{ allspark_xray.mount_root }}/mongodb/db":/data/db"
+  when: allspark_xray.enabled
+
+
+- name: Setup xray-persist
+  docker_container:
+    name: xray_xray-persist_1
+    image: "{{ downloads.xraypersist.image }}:{{ downloads.xraypersist.tag }}"
+    state: "{{ allspark_xray.enabled and 'started' or 'absent'}}"
+    network:
+      - name: artifactory_db
+      - name: xray_default
+    volumes:
+      - "{{ allspark_xray.mount_root }}/xray:{{ allspark_xray.xray_data }}"
+    restart_policy: always
+  when: allspark_xray.enabled
+
+- name: Setup xray-analysis
+  docker_container:
+    name: xray_xray-analysis_1
+    image: "{{ downloads.xrayanalysis.image }}:{{ downloads.xrayanalysis.tag }}"
+    state: "{{ allspark_xray.enabled and 'started' or 'absent'}}"
+    network:
+      - name: artifactory_db
+      - name: xray_default
+    volumes:
+      - "{{ allspark_xray.mount_root }}/xray:{{ allspark_xray.xray_data }}"
+    restart_policy: always
+  when: allspark_xray.enabled
+
+- name: Setup xray-indexer
+  docker_container:
+    name: xray_xray-indexer_1
+    image: "{{ downloads.xrayindexer.image }}:{{ downloads.xrayindexer.tag }}"
+    state: "{{ allspark_xray.enabled and 'started' or 'absent'}}"
+    network:
+      - name: artifactory_db
+      - name: xray_default
+    volumes:
+      - "{{ allspark_xray.mount_root }}/xray:{{ allspark_xray.xray_data }}"
+    restart_policy: always
+  when: allspark_xray.enabled
+
+- name: Setup xray-server
+  docker_container:
+    name: xray_xray-server_1
+    image: "{{ downloads.xrayserver.image }}:{{ downloads.xrayserver.tag }}"
+    state: "{{ allspark_xray.enabled and 'started' or 'absent'}}"
+    ports: 
+      - "{{ allspark_xray.ports }}":"{{ allspark_xray.ports }}"
+    env:
+      XRAYCONFIGPATH: "{{ allspark_xray.xray_data }}"
+    networks:
+      - name: artifactory_db
+      - name: xray_default
+    volumes:
+      - "{{ allspark_xray.mount_root }}/xray:{{ allspark_xray.xray_data }}"
+    restart_policy: always
+  when: allspark_xray.enabled
+
