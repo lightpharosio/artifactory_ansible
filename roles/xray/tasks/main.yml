@@ -12,7 +12,7 @@
 - name: Setup XRAY Rabbitmq
   docker_container:
     name: xray_rabbitmq_1
-    image: "{{ downloads.rabbitmq.image }}:{{ downloads.rabbitmq.tag }}"
+    image: "{{ downloads.xrayrabbitmq.image }}:{{ downloads.xrayrabbitmq.tag }}"
     state: "{{ allspark_xray.enabled and 'started' or 'absent'}}"
     env:
       RABBITMQ_ERLANG_COOKIE: "{{ allspark_xray.rabbitmq_erlang_cookie }}"
@@ -26,7 +26,7 @@
 - name: Setup XRAY PostGreSQL
   docker_container:
     name: xray_postgres_1
-    image: "{{ downloads.postgresql.image }}:{{ downloads.postgresql.tag }}"
+    image: "{{ downloads.xraypostgresql.image }}:{{ downloads.xraypostgresql.tag }}"
     state: "{{ allspark_xray.enabled and 'started' or 'absent'}}"
     env:
       POSTGRES_USER: "{{ allspark_xray.postgres_user }}"
@@ -42,7 +42,7 @@
 - name: Setup XRAY MongoDB
   docker_container:
     name: xray_mongodb_1
-    image: "{{ downloads.mongodb.image }}:{{ downloads.mongodb.tag }}"
+    image: "{{ downloads.xraymongodb.image }}:{{ downloads.xraymongodb.tag }}"
     state: "{{ allspark_xray.enabled and 'started' or 'absent'}}"
     entrypoint: /bin/bash -c "chmod 777 /data/logs; /entrypoint.sh --logpath /data/logs/xray-mongo.log --auth"
     network:

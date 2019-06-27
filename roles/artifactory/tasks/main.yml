@@ -14,7 +14,7 @@
 - name: Setup PostgreSQL database
   docker_container:
     name: artifactory_database
-    image: "{{ downloads.postgresql.image }}:{{ downloads.postgresql.tag }}"
+    image: "{{ downloads.artipostgresql.image }}:{{ downloads.artipostgresql.tag }}"
     state: "{{ allspark_artifactory.enabled and 'started' or 'absent'}}"
     env:
       POSTGRES_USER: "artifactory"
