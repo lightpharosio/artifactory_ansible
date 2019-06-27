@@ -99,7 +99,7 @@
     image: "{{ downloads.xrayserver.image }}:{{ downloads.xrayserver.tag }}"
     state: "{{ allspark_xray.enabled and 'started' or 'absent'}}"
     ports: 
-      - "{{ allspark_xray.ports }}":"{{ allspark_xray.ports }}"
+      - "{{ allspark_xray.ports }}:{{ allspark_xray.ports }}"
     env:
       XRAYCONFIGPATH: "{{ allspark_xray.xray_data }}"
     networks:
