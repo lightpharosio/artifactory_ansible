@@ -49,8 +49,8 @@
       - name: artifactory_db
     volumes:
       - "{{ allspark_xray.mount_root }}/mongodb/logs:/data/logs"
-      - "{{ allspark_xray.mount_root }}/mongodb/configdb":/data/configdb"
-      - "{{ allspark_xray.mount_root }}/mongodb/db":/data/db"
+      - "{{ allspark_xray.mount_root }}/mongodb/configdb:/data/configdb"
+      - "{{ allspark_xray.mount_root }}/mongodb/db:/data/db"
   when: allspark_xray.enabled
 
 
